@@ -1,4 +1,4 @@
-package br.edu.ifpb.catalogojogos;
+package br.edu.ifpb.catalogojogos.catalogojogos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

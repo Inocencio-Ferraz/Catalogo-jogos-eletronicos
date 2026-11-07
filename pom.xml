@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>17</java.version>
+		<djava.version>17</djava.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -56,5 +56,11 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependency>
+		<groupId>org.basex</groupId>
+		<artifactId>basex</artifactId>
+		<version>11.9</version>
+	</dependency>
 
 </project>
