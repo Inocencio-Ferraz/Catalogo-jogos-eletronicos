@@ -48,9 +48,9 @@ public class JogoService {
 
         validarJogo(jogo);
 
-        buscar(id);
-
-        jogoRepository.atualizar(id, jogo);
+        if (!jogoRepository.atualizar(id, jogo)) {
+            throw new IllegalArgumentException("Jogo não encontrado.");
+        }
 
         return jogo;
     }
@@ -58,9 +58,9 @@ public class JogoService {
     // Exclui um jogo
     public void excluir(String id) throws IOException {
 
-        buscar(id);
-
-        jogoRepository.excluir(id);
+        if (!jogoRepository.excluir(id)) {
+            throw new IllegalArgumentException("Jogo não encontrado.");
+        }
     }
 
     // Verifica se os dados informados são válidos

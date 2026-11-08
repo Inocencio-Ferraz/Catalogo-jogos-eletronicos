@@ -36,7 +36,7 @@ public class BaseXConfig {
 
             if ("false".equals(resultado.trim())) {
                 session.query(
-                        "db:create(<catalogo/>, '" + BANCO + "')"
+                        "db:create('" + BANCO + "', <catalogo/>)"
                 ).execute();
             }
 

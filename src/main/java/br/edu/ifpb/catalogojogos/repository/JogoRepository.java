@@ -65,7 +65,7 @@ public class JogoRepository {
 
         String consulta =
                 "<jogos>{db:open('" + BANCO +
-                        "')/catalogo/jogo[@id='" + id +
+                        "')/catalogo/jogo[@id='" + escaparXQuery(id) +
                         "']}</jogos>";
 
         try (ClientSession session = baseXConfig.abrirSessao()) {
@@ -85,13 +85,17 @@ public class JogoRepository {
     // Atualiza os dados de um jogo
     public boolean atualizar(String id, Jogo jogo) throws IOException {
 
+        if (buscarPorId(id) == null) {
+            return false;
+        }
+
         jogo.setId(id);
 
         String xml = converterParaXML(jogo);
 
         String consulta =
                 "let $jogo := db:open('" + BANCO +
-                        "')/catalogo/jogo[@id='" + id + "'] " +
+                        "')/catalogo/jogo[@id='" + escaparXQuery(id) + "'] " +
                         "return if (exists($jogo)) " +
                         "then replace node $jogo with " + xml +
                         "else ()";
@@ -107,9 +111,13 @@ public class JogoRepository {
     // Exclui um jogo pelo ID
     public boolean excluir(String id) throws IOException {
 
+        if (buscarPorId(id) == null) {
+            return false;
+        }
+
         String consulta =
                 "let $jogo := db:open('" + BANCO +
-                        "')/catalogo/jogo[@id='" + id + "'] " +
+                        "')/catalogo/jogo[@id='" + escaparXQuery(id) + "'] " +
                         "return if (exists($jogo)) " +
                         "then delete node $jogo " +
                         "else ()";
@@ -117,7 +125,6 @@ public class JogoRepository {
         try (ClientSession session = baseXConfig.abrirSessao()) {
 
             session.query(consulta).execute();
-
             return true;
         }
     }
@@ -149,6 +156,10 @@ public class JogoRepository {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&apos;");
+    }
+
+    private String escaparXQuery(String valor) {
+        return valor.replace("'", "''");
     }
 
     // Converte o resultado XML em uma lista de objetos Jogo

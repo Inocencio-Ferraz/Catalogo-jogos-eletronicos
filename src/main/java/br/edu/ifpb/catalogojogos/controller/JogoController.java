@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/jogos")
@@ -22,7 +23,7 @@ public class JogoController {
 
     // Cadastra um jogo
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Jogo jogo)
+    public ResponseEntity<?> cadastrar(@Valid @RequestBody Jogo jogo)
             throws IOException {
 
         try {
@@ -61,7 +62,7 @@ public class JogoController {
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(
             @PathVariable String id,
-            @RequestBody Jogo jogo) throws IOException {
+            @Valid @RequestBody Jogo jogo) throws IOException {
 
         try {
             return ResponseEntity.ok(

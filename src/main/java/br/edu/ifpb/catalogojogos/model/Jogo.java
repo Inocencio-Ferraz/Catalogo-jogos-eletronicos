@@ -1,14 +1,29 @@
 package br.edu.ifpb.catalogojogos.model;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+
 public class Jogo {
 
     private String id;
+    @NotBlank(message = "O título é obrigatório.")
     private String titulo;
+    @NotBlank(message = "A plataforma é obrigatória.")
     private String plataforma;
+    @NotBlank(message = "O gênero é obrigatório.")
     private String genero;
+    @NotBlank(message = "A desenvolvedora é obrigatória.")
     private String desenvolvedora;
+    @Min(value = 1950, message = "Ano de lançamento inválido.")
+    @Max(value = 2100, message = "Ano de lançamento inválido.")
     private int anoLancamento;
+    @Min(value = 0, message = "Classificação indicativa inválida.")
     private int classificacaoIndicativa;
+    @DecimalMin(value = "0.0", message = "A nota deve estar entre 0 e 10.")
+    @DecimalMax(value = "10.0", message = "A nota deve estar entre 0 e 10.")
     private double nota;
     private String descricao;
 
