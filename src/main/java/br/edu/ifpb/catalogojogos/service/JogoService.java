@@ -17,7 +17,6 @@ public class JogoService {
         this.jogoRepository = jogoRepository;
     }
 
-    // Cadastra um jogo
     public Jogo cadastrar(Jogo jogo) throws IOException {
 
         validarJogo(jogo);
@@ -25,13 +24,10 @@ public class JogoService {
         return jogoRepository.salvar(jogo);
     }
 
-    // Retorna todos os jogos
     public List<Jogo> listar() throws IOException {
-
         return jogoRepository.listarTodos();
     }
 
-    // Busca um jogo específico
     public Jogo buscar(String id) throws IOException {
 
         Jogo jogo = jogoRepository.buscarPorId(id);
@@ -43,7 +39,27 @@ public class JogoService {
         return jogo;
     }
 
-    // Atualiza um jogo
+    public List<Jogo> buscarPorGenero(String genero) throws IOException {
+
+        validarFiltro(genero);
+
+        return jogoRepository.buscarPorGenero(genero);
+    }
+
+    public List<Jogo> buscarPorPlataforma(String plataforma) throws IOException {
+
+        validarFiltro(plataforma);
+
+        return jogoRepository.buscarPorPlataforma(plataforma);
+    }
+
+    public List<Jogo> buscarPorDesenvolvedora(String desenvolvedora) throws IOException {
+
+        validarFiltro(desenvolvedora);
+
+        return jogoRepository.buscarPorDesenvolvedora(desenvolvedora);
+    }
+
     public Jogo atualizar(String id, Jogo jogo) throws IOException {
 
         validarJogo(jogo);
@@ -55,7 +71,6 @@ public class JogoService {
         return jogo;
     }
 
-    // Exclui um jogo
     public void excluir(String id) throws IOException {
 
         if (!jogoRepository.excluir(id)) {
@@ -63,7 +78,13 @@ public class JogoService {
         }
     }
 
-    // Verifica se os dados informados são válidos
+    private void validarFiltro(String valor) {
+
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("O valor da pesquisa é obrigatório.");
+        }
+    }
+
     private void validarJogo(Jogo jogo) {
 
         if (jogo == null) {

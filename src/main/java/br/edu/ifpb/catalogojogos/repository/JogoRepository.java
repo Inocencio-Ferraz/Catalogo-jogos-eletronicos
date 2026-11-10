@@ -27,29 +27,26 @@ public class JogoRepository {
         this.baseXConfig = baseXConfig;
     }
 
-    // Cadastra um novo jogo
     public Jogo salvar(Jogo jogo) throws IOException {
 
         jogo.setId(UUID.randomUUID().toString());
 
         String xml = converterParaXML(jogo);
 
+        String consulta = "insert node " + xml +
+                " into db:get('" + BANCO + "')/catalogo";
+
         try (ClientSession session = baseXConfig.abrirSessao()) {
-
-            String consulta = "insert node " + xml +
-                    " into db:open('" + BANCO + "')/catalogo";
-
             session.query(consulta).execute();
         }
 
         return jogo;
     }
 
-    // Lista todos os jogos cadastrados
     public List<Jogo> listarTodos() throws IOException {
 
         String consulta =
-                "<jogos>{db:open('" + BANCO +
+                "<jogos>{db:get('" + BANCO +
                         "')/catalogo/jogo}</jogos>";
 
         try (ClientSession session = baseXConfig.abrirSessao()) {
@@ -60,11 +57,10 @@ public class JogoRepository {
         }
     }
 
-    // Busca um jogo pelo ID
     public Jogo buscarPorId(String id) throws IOException {
 
         String consulta =
-                "<jogos>{db:open('" + BANCO +
+                "<jogos>{db:get('" + BANCO +
                         "')/catalogo/jogo[@id='" + escaparXQuery(id) +
                         "']}</jogos>";
 
@@ -82,7 +78,40 @@ public class JogoRepository {
         }
     }
 
-    // Atualiza os dados de um jogo
+    public List<Jogo> buscarPorGenero(String genero) throws IOException {
+        return buscarPorCampo("genero", genero);
+    }
+
+    public List<Jogo> buscarPorPlataforma(String plataforma) throws IOException {
+        return buscarPorCampo("plataforma", plataforma);
+    }
+
+    public List<Jogo> buscarPorDesenvolvedora(String desenvolvedora) throws IOException {
+        return buscarPorCampo("desenvolvedora", desenvolvedora);
+    }
+
+    private List<Jogo> buscarPorCampo(String campo, String valor) throws IOException {
+
+        if (!List.of("genero", "plataforma", "desenvolvedora").contains(campo)) {
+            throw new IllegalArgumentException("Campo de pesquisa inválido.");
+        }
+
+        String consulta =
+                "let $valor := lower-case('" + escaparXQuery(valor) + "') " +
+                        "return <jogos>{ " +
+                        "for $jogo in db:get('" + BANCO + "')/catalogo/jogo " +
+                        "where contains(lower-case(string($jogo/" + campo + ")), $valor) " +
+                        "return $jogo " +
+                        "}</jogos>";
+
+        try (ClientSession session = baseXConfig.abrirSessao()) {
+
+            String resultado = session.query(consulta).execute();
+
+            return converterListaXML(resultado);
+        }
+    }
+
     public boolean atualizar(String id, Jogo jogo) throws IOException {
 
         if (buscarPorId(id) == null) {
@@ -94,7 +123,7 @@ public class JogoRepository {
         String xml = converterParaXML(jogo);
 
         String consulta =
-                "let $jogo := db:open('" + BANCO +
+                "let $jogo := db:get('" + BANCO +
                         "')/catalogo/jogo[@id='" + escaparXQuery(id) + "'] " +
                         "return if (exists($jogo)) " +
                         "then replace node $jogo with " + xml +
@@ -102,13 +131,12 @@ public class JogoRepository {
 
         try (ClientSession session = baseXConfig.abrirSessao()) {
 
-            String resultado = session.query(consulta).execute();
+            session.query(consulta).execute();
 
-            return !resultado.contains("false");
+            return true;
         }
     }
 
-    // Exclui um jogo pelo ID
     public boolean excluir(String id) throws IOException {
 
         if (buscarPorId(id) == null) {
@@ -116,7 +144,7 @@ public class JogoRepository {
         }
 
         String consulta =
-                "let $jogo := db:open('" + BANCO +
+                "let $jogo := db:get('" + BANCO +
                         "')/catalogo/jogo[@id='" + escaparXQuery(id) + "'] " +
                         "return if (exists($jogo)) " +
                         "then delete node $jogo " +
@@ -125,11 +153,11 @@ public class JogoRepository {
         try (ClientSession session = baseXConfig.abrirSessao()) {
 
             session.query(consulta).execute();
+
             return true;
         }
     }
 
-    // Converte um objeto Jogo para XML
     private String converterParaXML(Jogo jogo) {
 
         return "<jogo id='" + escaparXML(jogo.getId()) + "'>" +
@@ -144,7 +172,6 @@ public class JogoRepository {
                 "</jogo>";
     }
 
-    // Evita problemas com caracteres especiais no XML
     private String escaparXML(String valor) {
 
         if (valor == null) {
@@ -162,7 +189,6 @@ public class JogoRepository {
         return valor.replace("'", "''");
     }
 
-    // Converte o resultado XML em uma lista de objetos Jogo
     private List<Jogo> converterListaXML(String xml) {
 
         List<Jogo> jogos = new ArrayList<>();

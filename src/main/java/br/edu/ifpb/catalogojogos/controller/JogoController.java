@@ -21,7 +21,6 @@ public class JogoController {
         this.jogoService = jogoService;
     }
 
-    // Cadastra um jogo
     @PostMapping
     public ResponseEntity<?> cadastrar(@Valid @RequestBody Jogo jogo)
             throws IOException {
@@ -37,14 +36,48 @@ public class JogoController {
         }
     }
 
-    // Lista todos os jogos
     @GetMapping
     public ResponseEntity<List<Jogo>> listar() throws IOException {
 
         return ResponseEntity.ok(jogoService.listar());
     }
 
-    // Busca um jogo pelo ID
+    @GetMapping("/genero/{genero}")
+    public ResponseEntity<?> buscarPorGenero(@PathVariable String genero)
+            throws IOException {
+
+        try {
+            return ResponseEntity.ok(jogoService.buscarPorGenero(genero));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/plataforma/{plataforma}")
+    public ResponseEntity<?> buscarPorPlataforma(@PathVariable String plataforma)
+            throws IOException {
+
+        try {
+            return ResponseEntity.ok(jogoService.buscarPorPlataforma(plataforma));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/desenvolvedora/{nome}")
+    public ResponseEntity<?> buscarPorDesenvolvedora(@PathVariable String nome)
+            throws IOException {
+
+        try {
+            return ResponseEntity.ok(jogoService.buscarPorDesenvolvedora(nome));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> buscar(@PathVariable String id)
             throws IOException {
@@ -58,7 +91,6 @@ public class JogoController {
         }
     }
 
-    // Atualiza um jogo
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(
             @PathVariable String id,
@@ -80,7 +112,6 @@ public class JogoController {
         }
     }
 
-    // Exclui um jogo
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluir(@PathVariable String id)
             throws IOException {
